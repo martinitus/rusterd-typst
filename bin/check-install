@@ -1,0 +1,10 @@
+#!/bin/sh
+set -eu
+
+repo_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+cd "$repo_dir"
+
+bin/install
+
+typst compile check-install.typ target/rusterd-typst-install-check.pdf
+printf '%s\n' "Installed-package compilation succeeded: target/rusterd-typst-install-check.pdf"

@@ -1,0 +1,25 @@
+#!/bin/sh
+set -eu
+
+repo_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+cd "$repo_dir"
+
+cargo build --release --target wasm32-unknown-unknown
+cp target/wasm32-unknown-unknown/release/rusterd.wasm rusterd.wasm
+
+if [ -n "${TYPST_PACKAGE_PATH:-}" ]; then
+  package_path=$TYPST_PACKAGE_PATH
+elif [ -n "${XDG_DATA_HOME:-}" ]; then
+  package_path=$XDG_DATA_HOME/typst/packages
+else
+  case $(uname -s) in
+    Darwin) package_path="$HOME/Library/Application Support/typst/packages" ;;
+    *) package_path="$HOME/.local/share/typst/packages" ;;
+  esac
+fi
+
+install_path="$package_path/local/rusterd/0.1.0"
+mkdir -p "$install_path"
+cp typst.toml lib.typ rusterd.wasm "$install_path/"
+
+printf '%s\n' "Installed @local/rusterd:0.1.0 to $install_path"

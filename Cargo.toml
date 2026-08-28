@@ -1,0 +1,17 @@
+[package]
+name = "rusterd-typst"
+version = "0.1.0"
+edition = "2024"
+description = "Typst plugin for rendering rusterd ER diagrams"
+license = "MIT"
+repository = "https://github.com/martinitus/rusterd-typst"
+publish = false
+
+[lib]
+name = "rusterd"
+crate-type = ["cdylib"]
+
+[dependencies]
+rusterd = { git = "https://github.com/martinitus/rusterd", rev = "e19191d", default-features = false }
+wasm-minimal-protocol = "0.2"
+
