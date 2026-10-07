@@ -83,8 +83,9 @@ This runs `bin/install` and compiles `check-install.typ` to
 `target/rusterd-typst-install-check.pdf`.
 
 The package uses the fork at
-`github.com/martinitus/rusterd`, pinned to compatibility commit `e19191d`.
-That commit is based directly on `origin/main` and only makes rusterd's existing
+`github.com/martinitus/rusterd`, pinned to compatibility commit
+`cd360cea566950ea5f0546b610a0e7dc2e56e063`.
+That commit is based directly on the current upstream `main` and only makes rusterd's existing
 browser `wasm-bindgen` API optional through the `wasm-api` feature. The Typst
 glue calls rusterd's existing parser, IR, layout, and SVG modules directly;
 it does not require a new public renderer API.

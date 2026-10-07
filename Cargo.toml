@@ -12,6 +12,5 @@ name = "rusterd"
 crate-type = ["cdylib"]
 
 [dependencies]
-rusterd = { git = "https://github.com/martinitus/rusterd", rev = "e19191d", default-features = false }
+rusterd = { git = "https://github.com/martinitus/rusterd", rev = "cd360cea566950ea5f0546b610a0e7dc2e56e063", default-features = false }
 wasm-minimal-protocol = "0.2"
-
