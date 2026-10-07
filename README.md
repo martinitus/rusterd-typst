@@ -20,7 +20,7 @@ entity User {
     id int pk
     email string unique not null
 }
-`, width: 100%)
+`, image-options: (width: 100%,))
 ```
 
 The first argument can be a Typst raw text literal or a string. Optional
@@ -33,7 +33,10 @@ arguments are:
 - `legend`: draw a key for the cardinality symbols, defaulting to `false`
 - `dense`: reduce spacing for large diagrams, defaulting to `false`
 - `aspect`: target a width:height ratio such as `"16:9"`, defaulting to `"1:1"`
-- `width`: the image width, defaulting to `auto`
+- `image-options`: dictionary of options forwarded to Typst's `image`; it defaults to an empty dictionary, so Typst's image defaults apply
+
+The `format` image option is reserved and cannot be overridden: rusterd always
+returns SVG data.
 
 ## Building the WASM artifact
 

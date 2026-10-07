@@ -18,4 +18,4 @@ rel {
 focus checkout {
     include User, Order
 }
-`, focus: "checkout",detail: "all", notation: "text", legend: true, dense: false, aspect: "4:4", width: 100%)
+`, focus: "checkout", detail: "all", notation: "text", legend: true, dense: false, aspect: "4:4", image-options: (width: 100%, height: 10cm, fit: "contain", alt: "Checkout diagram"))

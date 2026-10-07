@@ -17,7 +17,7 @@
   legend: false,
   dense: false,
   aspect: "1:1",
-  width: auto,
+  image-options: (:),
 ) = {
   let selected-focus = if focus != none {
     focus
@@ -26,6 +26,10 @@
   } else {
     view
   }
+  if image-options.keys().contains("format") {
+    panic("image-options cannot override format; rusterd always renders SVG")
+  }
+
   image(
     _plugin.render(
       bytes(_source-text(source)),
@@ -37,6 +41,6 @@
       bytes(aspect),
     ),
     format: "svg",
-    width: width,
+    ..image-options,
   )
 }

@@ -14,4 +14,4 @@ entity Order {
 rel {
     User 1 -- * Order : "places"
 }
-`, detail: "pk_fk", notation: "text", width: 100%)
+`, detail: "pk_fk", notation: "text", image-options: (width: 100%,))
