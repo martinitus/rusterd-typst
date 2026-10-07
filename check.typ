@@ -18,4 +18,4 @@ rel {
 focus checkout {
     include User, Order
 }
-`, focus: "checkout", detail: "pk_fk", notation: "text", width: 100%)
+`, focus: "checkout",detail: "all", notation: "text", legend: true, dense: false, aspect: "4:4", width: 100%)

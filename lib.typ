@@ -6,12 +6,17 @@
   source.text
 }
 
+#let _bool-text(value) = if value { "true" } else { "false" }
+
 #let erd(
   source,
   focus: none,
   view: none,
   detail: "all",
   notation: "crowsfoot",
+  legend: false,
+  dense: false,
+  aspect: "1:1",
   width: auto,
 ) = {
   let selected-focus = if focus != none {
@@ -27,6 +32,9 @@
       bytes(selected-focus),
       bytes(detail),
       bytes(notation),
+      bytes(_bool-text(legend)),
+      bytes(_bool-text(dense)),
+      bytes(aspect),
     ),
     format: "svg",
     width: width,

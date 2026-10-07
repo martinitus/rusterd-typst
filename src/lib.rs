@@ -1,5 +1,5 @@
 use rusterd::ir::{DetailLevel, GraphIR};
-use rusterd::layout::LayoutEngine;
+use rusterd::layout::{LayoutEngine, aspect_from_name};
 use rusterd::parser::Parser;
 use rusterd::svg::{Notation, SvgRenderer};
 #[cfg(target_arch = "wasm32")]
@@ -10,12 +10,23 @@ wasm_minimal_protocol::initiate_protocol!();
 
 #[cfg_attr(not(target_arch = "wasm32"), allow(dead_code))]
 #[cfg_attr(target_arch = "wasm32", wasm_func)]
-fn render(source: &[u8], view: &[u8], detail: &[u8], notation: &[u8]) -> Result<Vec<u8>, String> {
+fn render(
+    source: &[u8],
+    view: &[u8],
+    detail: &[u8],
+    notation: &[u8],
+    legend: &[u8],
+    dense: &[u8],
+    aspect: &[u8],
+) -> Result<Vec<u8>, String> {
     let source = std::str::from_utf8(source)
         .map_err(|error| format!("invalid UTF-8 in ERD source: {error}"))?;
     let view = decode_optional(view, "view")?;
     let detail = decode_detail(detail)?;
     let notation = decode_notation(notation)?;
+    let legend = decode_bool(legend, "legend")?;
+    let dense = decode_bool(dense, "dense")?;
+    let aspect = decode_aspect(aspect)?;
 
     let mut parser = Parser::new(source).map_err(|error| error.to_string())?;
     let schema = parser.parse().map_err(|error| error.to_string())?;
@@ -31,9 +42,13 @@ fn render(source: &[u8], view: &[u8], detail: &[u8], notation: &[u8]) -> Result<
     }
 
     let ir = GraphIR::from_schema(&schema, view.as_deref(), detail);
-    let layout = LayoutEngine::default().layout(&ir);
+    let layout = LayoutEngine::default()
+        .with_dense_spacing(dense)
+        .with_aspect(aspect)
+        .layout(&ir);
     Ok(SvgRenderer::default()
         .with_notation(notation)
+        .with_legend(legend)
         .render(&ir, &layout)
         .into_bytes())
 }
@@ -47,6 +62,32 @@ fn decode_optional(value: &[u8], name: &str) -> Result<Option<String>, String> {
     std::str::from_utf8(value)
         .map(|value| Some(value.to_owned()))
         .map_err(|error| format!("invalid UTF-8 in {name}: {error}"))
+}
+
+#[allow(dead_code)]
+fn decode_bool(value: &[u8], name: &str) -> Result<bool, String> {
+    if value.is_empty() {
+        return Ok(false);
+    }
+
+    let value =
+        std::str::from_utf8(value).map_err(|error| format!("invalid UTF-8 in {name}: {error}"))?;
+    match value {
+        "true" => Ok(true),
+        "false" => Ok(false),
+        _ => Err(format!("invalid {name}: {value}")),
+    }
+}
+
+#[allow(dead_code)]
+fn decode_aspect(value: &[u8]) -> Result<f64, String> {
+    if value.is_empty() {
+        return Ok(1.0);
+    }
+
+    let value =
+        std::str::from_utf8(value).map_err(|error| format!("invalid UTF-8 in aspect: {error}"))?;
+    aspect_from_name(value).ok_or_else(|| format!("invalid aspect: {value}"))
 }
 
 #[allow(dead_code)]
@@ -79,6 +120,8 @@ mod tests {
     fn defaults_are_used_for_empty_options() {
         assert_eq!(decode_detail(b""), Ok(DetailLevel::All));
         assert_eq!(decode_notation(b""), Ok(Notation::CrowsFoot));
+        assert_eq!(decode_bool(b"", "legend"), Ok(false));
+        assert_eq!(decode_aspect(b""), Ok(1.0));
         assert_eq!(decode_optional(b"", "focus"), Ok(None));
     }
 
@@ -86,13 +129,23 @@ mod tests {
     fn invalid_options_are_reported() {
         assert!(decode_detail(b"compact").is_err());
         assert!(decode_notation(b"compact").is_err());
+        assert!(decode_bool(b"maybe", "legend").is_err());
+        assert!(decode_aspect(b"wide").is_err());
         assert!(decode_optional(&[0xff], "view").is_err());
     }
 
     #[test]
     fn render_returns_svg_bytes() {
-        let svg = render(b"entity User { id int pk }", b"", b"all", b"crowsfoot")
-            .expect("valid ERD source should render");
+        let svg = render(
+            b"entity User { id int pk }",
+            b"",
+            b"all",
+            b"crowsfoot",
+            b"false",
+            b"false",
+            b"1:1",
+        )
+        .expect("valid ERD source should render");
 
         let svg = String::from_utf8(svg).expect("renderer output should be UTF-8");
         assert!(svg.starts_with("<svg "));

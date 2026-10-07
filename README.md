@@ -30,6 +30,9 @@ arguments are:
 - `view`: deprecated alias for `focus`
 - `detail`: `tables`, `pk`, `pk_fk`, or `all`
 - `notation`: `crowsfoot` or `text`
+- `legend`: draw a key for the cardinality symbols, defaulting to `false`
+- `dense`: reduce spacing for large diagrams, defaulting to `false`
+- `aspect`: target a width:height ratio such as `"16:9"`, defaulting to `"1:1"`
 - `width`: the image width, defaulting to `auto`
 
 ## Building the WASM artifact
